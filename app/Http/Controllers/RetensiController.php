@@ -18,9 +18,10 @@ class RetensiController extends Controller
     {
         $data = [
             'title' => 'Retensi Arsip',
-            'retensi' => $this->RetensiModel->allData(),
+            'retensi' => $this->RetensiModel->allData(), // Sesuaikan dengan method model Anda
         ];
 
+        // Hitung statistik umum
         $retensi_total = DB::table('tb_retensi_arsip')->count();
         $retensi_blm_selesai = DB::table('tb_retensi_arsip')->whereNull('putusan')->count();
         $retensi_selesai = DB::table('tb_retensi_arsip')->whereNotNull('putusan')->count();
@@ -29,15 +30,110 @@ class RetensiController extends Controller
         $retensi_progres = $retensi_total > 0 ? ($retensi_selesai / $retensi_total * 100) : 0;
         $retensi_presentase = round($retensi_progres);
 
+        // REKAP DATA BERDASARKAN FIELD TAHUN DALAM BENTUK TABEL
+        $rekap_tahun = DB::table('tb_retensi_arsip')
+            ->select(
+                'tahun',
+                DB::raw('COUNT(*) as total'),
+                DB::raw('SUM(CASE WHEN putusan IS NOT NULL THEN 1 ELSE 0 END) as selesai'),
+                DB::raw('SUM(CASE WHEN putusan IS NULL THEN 1 ELSE 0 END) as belum_selesai')
+            )
+            ->groupBy('tahun')
+            ->orderBy('tahun', 'desc')
+            ->get();
+
         return view('/retensi_arsip/v_retensi_dashboard', $data, compact(
             'retensi_total',
             'retensi_blm_selesai',
             'retensi_selesai',
             'retensi_progres',
             'retensi_presentase',
+            'rekap_tahun'
         ));
     }
 
+    /**
+     * Menampilkan data retensi berdasarkan tahun
+     */
+    public function showByYear($tahun)
+    {
+        // Validasi tahun
+        if (!is_numeric($tahun) || $tahun < 1800 || $tahun > 2100) {
+            return redirect()->route('retensi.dashboard')
+                ->with('error', 'Tahun tidak valid! Harus antara 1900-2100.');
+        }
+
+
+        $data = [
+            'title' => 'Retensi Arsip Tahun ' . $tahun,
+        ];
+
+        // Ambil data retensi berdasarkan tahun
+        $retensi_per_tahun = DB::table('tb_retensi_arsip')
+            ->where('tahun', $tahun)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Hitung statistik untuk tahun tersebut
+        $total_tahun = $retensi_per_tahun->count();
+        $selesai_tahun = $retensi_per_tahun->whereNotNull('putusan')->count();
+        $blm_selesai_tahun = $retensi_per_tahun->whereNull('putusan')->count();
+        $progress_tahun = $total_tahun > 0 ? round(($selesai_tahun / $total_tahun) * 100) : 0;
+
+        // Ambil tahun-tahun yang tersedia untuk dropdown navigasi
+        $tahun_tersedia = DB::table('tb_retensi_arsip')
+            ->select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        return view('/retensi_arsip/v_retensi_per_tahun', $data, compact(
+            'retensi_per_tahun',
+            'tahun',
+            'total_tahun',
+            'selesai_tahun',
+            'blm_selesai_tahun',
+            'progress_tahun',
+            'tahun_tersedia'
+        ));
+    }
+
+    /**
+     * Download file putusan
+     */
+    public function downloadPutusan($id)
+    {
+        $retensi = DB::table('tb_retensi_arsip')->where('id', $id)->first();
+
+        if (!$retensi || !$retensi->putusan) {
+            return redirect()->back()->with('error', 'File tidak ditemukan!');
+        }
+
+        $filePath = storage_path('app/public/' . $retensi->putusan);
+
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'File tidak ditemukan di server!');
+        }
+
+        return response()->download($filePath);
+    }
+
+    /**
+     * Menampilkan detail retensi
+     */
+    public function showDetail($id)
+    {
+        $retensi = DB::table('tb_retensi_arsip')->where('id', $id)->first();
+
+        if (!$retensi) {
+            return redirect()->back()->with('error', 'Data retensi tidak ditemukan!');
+        }
+
+        return view('/retensi_arsip/v_retensi_detail', [
+            'title' => 'Detail Retensi Arsip',
+            'retensi' => $retensi
+        ]);
+    }
     public function retensi_sdh()
     {
         $data = [
@@ -143,7 +239,7 @@ class RetensiController extends Controller
         ];
 
         $this->RetensiModel->addData($data);
-        return redirect()->route('retensi')->with('pesan', 'Data Berhasil Ditambahkan !!');
+        return redirect()->route('retensi_total')->with('pesan', 'Data Berhasil Ditambahkan !!');
     }
 
     public function edit($id)
@@ -241,7 +337,7 @@ class RetensiController extends Controller
 
             $this->RetensiModel->editData($id, $data);
         }
-        return redirect()->route('retensi')->with('pesan', 'Data Berhasil Diupdate !!');
+        return redirect()->route('retensi_total')->with('pesan', 'Data Berhasil Diupdate !!');
     }
 
     public function delete($id)
@@ -253,6 +349,6 @@ class RetensiController extends Controller
         }
 
         $this->RetensiModel->deleteData($id);
-        return redirect()->route('retensi')->with('pesan', 'Data Berhasil Dihapus !!');
+        return redirect()->route('retensi_total')->with('pesan', 'Data Berhasil Dihapus !!');
     }
 }

@@ -153,6 +153,9 @@ Route::post('/retensi/update/{id}', [RetensiController::class, 'update'])->name(
 Route::get('/retensi_blm', [RetensiController::class, 'retensi_blm'])->name('retensi_blm');
 Route::get('/retensi_sdh', [RetensiController::class, 'retensi_sdh'])->name('retensi_sdh');
 Route::get('/retensi_total', [RetensiController::class, 'retensi_total'])->name('retensi_total');
+Route::get('/retensi/tahun/{tahun}', [RetensiController::class, 'showByYear'])->name('retensi.by_year');
+Route::get('/retensi/download/{id}', [RetensiController::class, 'downloadPutusan'])->name('retensi.download');
+Route::get('/retensi/detail/{id}', [RetensiController::class, 'showDetail'])->name('retensi.detail');
 // Route::get('/retensi/delete/{id}', [RetensiController::class, 'delete'])->name('delete');
 
 //Surat Keputusan

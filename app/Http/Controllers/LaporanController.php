@@ -96,7 +96,7 @@ class LaporanController extends Controller
         return view('laporans.show', compact('laporan'));
     }
 
-// atau gunakan route model binding secara konsisten
+    // atau gunakan route model binding secara konsisten
 
     /**
      * Show the form for editing the specified resource.
@@ -104,7 +104,7 @@ class LaporanController extends Controller
      * @param  \App\Models\Laporan  $laporan
      * @return \Illuminate\Http\Response
      */
-        public function edit($id)
+    public function edit($id)
     {
         $laporans = Laporan::findOrFail($id);
         $title = 'Edit Laporan';
@@ -133,6 +133,9 @@ class LaporanController extends Controller
             'judul' => 'required|string|max:255',
             'dokumen' => 'nullable|file|mimes:pdf|max:5048',
             'konsep' => 'nullable|file|mimes:doc,docx,rtf|max:5048'
+        ], [
+            'konsep.mimes' => 'File konsep harus berformat: DOC, DOCX, atau RTF',
+            'konsep.max' => 'Ukuran file konsep tidak boleh lebih dari 5MB'
         ]);
 
         $data = $request->all();
@@ -150,7 +153,7 @@ class LaporanController extends Controller
             $data['dokumen'] = $fileName;
         }
 
-          // Upload konsep baru jika ada
+        // Upload konsep baru jika ada
         if ($request->hasFile('konsep')) {
             // Hapus konsep lama jika ada
             if ($laporan->konsep) {
@@ -175,7 +178,7 @@ class LaporanController extends Controller
      * @param  \App\Models\Laporan  $laporan
      * @return \Illuminate\Http\Response
      */
-        public function destroy($id)
+    public function destroy($id)
     {
         try {
             $laporan = Laporan::findOrFail($id);
@@ -206,7 +209,6 @@ class LaporanController extends Controller
 
             return redirect()->route('laporans.index')
                 ->with('pesan', 'Laporan berhasil dihapus.');
-
         } catch (\Exception $e) {
             \Log::error('Delete error: ' . $e->getMessage());
             return redirect()->route('laporans.index')

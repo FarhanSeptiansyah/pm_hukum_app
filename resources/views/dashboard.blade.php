@@ -458,6 +458,35 @@
                 </div>
             </div>
 
+            <!-- Laporan -->
+            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="xe-widget xe-progress-counter xe-progress-counter-success animated-widget" data-count=".num"
+                    data-from="0" data-to="{{ $sk_blm_upload }}" data-duration="3">
+                    <div class="xe-background">
+                        <i class="fa fa-edit pulse"></i>
+                    </div>
+                    <div class="xe-upper">
+                        <div class="xe-icon">
+                            <i class="fa fa-edit"></i>
+                        </div>
+                        <div class="xe-label">
+                            <span>Laporan</span>
+                            <strong class="num">0</strong>
+                        </div>
+                    </div>
+                    <div class="xe-progress">
+                        <span class="xe-progress-fill" data-fill-from="0" data-fill-to="{{ $sk_presentase }}"
+                            data-fill-unit="%" data-fill-property="width" data-fill-duration="3"
+                            data-fill-easing="true"></span>
+                    </div>
+                    <div class="xe-lower">
+                        <span>Jumlah Laporan</span>
+                        <strong>{{ $sk_total }}</strong>
+                    </div>
+                    <div class="widget-wave"></div>
+                </div>
+            </div>
+
             <!-- Weather Widget -->
             <div class="col-md-12">
                 <div class="xe-widget xe-weather animated-widget">

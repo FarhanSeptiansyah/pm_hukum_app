@@ -134,7 +134,7 @@ class JdihController extends Controller
         ];
 
         $this->JdihModel->addData($data);
-        return redirect()->route('himper')->with('pesan', 'Data Berhasil Ditambahkan !!');
+        return redirect()->back()->with('pesan', 'Data Berhasil Ditambahkan !!');
     }
 
     //Edit Data

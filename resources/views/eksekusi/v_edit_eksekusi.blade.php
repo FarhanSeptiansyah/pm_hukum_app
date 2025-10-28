@@ -13,7 +13,7 @@
 
         <div class="panel-body">
 
-            <form action="/eks/update/{{ $eksekusi->id_eks }}" method="POST" enctype="multipart/form-data">
+            <form action="/eks/update/{{ $eksekusi->id }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <!-- left column -->
@@ -103,7 +103,8 @@
                                     <option> Penetapan Eksekusi Riil </option>
                                     <option> Pelaksanaan Eksekusi Lelang </option>
                                     <option> Pelaksanaan Eksekusi Riil </option>
-                                    <option> Penyerahan Hasil Eksekusi/Lelang </option>
+                                    <option> Penyerahan Hasil Eksekusi </option>
+                                    <option> Penyerahan Hasil Lelang </option>
                                     <option> Penetapan Cabut </option>
                                     <option> Penetapan Coret </option>
                                     <option> Penetapan Non-Eksekutabel </option>

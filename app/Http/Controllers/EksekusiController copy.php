@@ -72,11 +72,11 @@ class EksekusiController extends Controller
         $eksekusi_ht = DB::table('tb_eksekusi')->whereNull('no_put')->count();
 
         $eksekusi_riil = DB::table('tb_eksekusi')
-            ->where('proses_terakhir', 'Penyerahan Hasil Eksekusi Riil')
+            ->where('proses_terakhir', 'Pelaksanaan Eksekusi Riil')
             ->count();
 
         $eksekusi_lelang = DB::table('tb_eksekusi')
-            ->where('proses_terakhir', 'Penyerahan Hasil Lelang')
+            ->where('proses_terakhir', 'Penyerahan Hasil Eksekusi/Lelang')
             ->count();
 
         $eksekusi_dicabut = DB::table('tb_eksekusi')
@@ -116,9 +116,9 @@ class EksekusiController extends Controller
             'eksekusi' => $this->EksekusiModel->allData(),
         ];
 
-        // Handle tanggal kosong dengan nilai default
-        $startDate = $request->start_date ?: '1900-01-01';
-        $endDate = $request->end_date ?: Carbon::now()->format('Y-m-d');
+        // Default tanggal KOSONG (tampilkan semua data)
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
 
         // Function Tahun sekarang
         $currentDate = Carbon::now();
@@ -126,26 +126,18 @@ class EksekusiController extends Controller
         $month = $currentDate->format('m');
         $year = $currentDate->format('Y');
 
-        // Data umum dengan filter tanggal yang konsisten
+        // Data umum dengan filter tanggal
         $eksekusi_total = DB::table('tb_eksekusi')
-            ->when($request->start_date || $request->end_date, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tgl_permohonan', [$startDate, $endDate]);
-            })
+            ->whereBetween('tgl_permohonan', [$startDate, $endDate])
             ->count();
 
         $eksekusi_masuk_thn_ini = DB::table('tb_eksekusi')
             ->whereYear('tgl_permohonan', $year)
-            ->when($request->start_date || $request->end_date, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tgl_permohonan', [$startDate, $endDate]);
-            })
             ->count();
 
         $eksekusi_bln_ini = DB::table('tb_eksekusi')
             ->whereMonth('tgl_permohonan', $month)
             ->whereYear('tgl_permohonan', $year)
-            ->when($request->start_date || $request->end_date, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tgl_permohonan', [$startDate, $endDate]);
-            })
             ->count();
 
         // Mapping kelas satker
@@ -179,11 +171,12 @@ class EksekusiController extends Controller
         ];
 
         $results = [];
-        $totalPerKelas = [];
+        $totalPerKelas = []; // Untuk menghitung total per kelas
 
         foreach ($kelasSatker as $satker => $kelas) {
-            // Gunakan tanggal dari request (bisa kosong)
-            $results[$satker] = $this->hitungDataEksekusi($satker, $request->start_date, $request->end_date, $kelas);
+            // Panggil function hitungDataEksekusi yang sudah ada
+            $results[$satker] = $this->hitungDataEksekusi($satker, $startDate, $endDate);
+            $results[$satker]['kelas'] = $kelas; // Tambahkan kelas ke hasil
 
             // Hitung total per kelas
             if (!isset($totalPerKelas[$kelas])) {
@@ -195,22 +188,10 @@ class EksekusiController extends Controller
                     'dicoret' => 0,
                     'ne' => 0,
                     'selesai' => 0,
-                    'sisa' => 0,
-                    'selesai_eks' => 0,
-                    'selesai_penuh' => 0,
-                    'selesai_parsial' => 0,
-                    'presentase' => 0,
-                    'bobot_nilai' => 0,
-                    // Detail untuk perhitungan bobot nilai
-                    'total_nilai_proses' => 0,
-                    'poin_dasar' => 0,
-                    'poin_proses' => 0,
-                    'poin_penyelesaian' => 0,
-                    'total_seluruh_poin' => 0
+                    'bobot_nilai' => 0
                 ];
             }
 
-            // Aggregasi data dasar
             $totalPerKelas[$kelas]['total'] += $results[$satker]['total'];
             $totalPerKelas[$kelas]['riil'] += $results[$satker]['riil'];
             $totalPerKelas[$kelas]['lelang'] += $results[$satker]['lelang'];
@@ -218,258 +199,86 @@ class EksekusiController extends Controller
             $totalPerKelas[$kelas]['dicoret'] += $results[$satker]['dicoret'];
             $totalPerKelas[$kelas]['ne'] += $results[$satker]['ne'];
             $totalPerKelas[$kelas]['selesai'] += $results[$satker]['selesai'];
-            $totalPerKelas[$kelas]['sisa'] += $results[$satker]['sisa'];
-            $totalPerKelas[$kelas]['selesai_eks'] += $results[$satker]['selesai_eks'];
-            $totalPerKelas[$kelas]['selesai_penuh'] += $results[$satker]['selesai_penuh'];
-            $totalPerKelas[$kelas]['selesai_parsial'] += $results[$satker]['selesai_parsial'];
-            $totalPerKelas[$kelas]['total_nilai_proses'] += $results[$satker]['total_nilai_proses'];
-
-            // Aggregasi data poin untuk perhitungan bobot
-            $totalPerKelas[$kelas]['poin_dasar'] += $results[$satker]['bobot_nilai_detail']['detail']['poin_dasar'];
-            $totalPerKelas[$kelas]['poin_proses'] += $results[$satker]['bobot_nilai_detail']['detail']['poin_proses'];
-            $totalPerKelas[$kelas]['poin_penyelesaian'] += $results[$satker]['bobot_nilai_detail']['detail']['poin_penyelesaian'];
-            $totalPerKelas[$kelas]['total_seluruh_poin'] += $results[$satker]['bobot_nilai_detail']['detail']['total_seluruh_poin'];
+            $totalPerKelas[$kelas]['bobot_nilai'] += $results[$satker]['bobot_nilai'];
         }
 
-        // Hitung presentase dan bobot nilai untuk total per kelas
-        foreach ($totalPerKelas as $kelas => &$data) {
-            // Hitung presentase
-            if ($data['selesai'] > 0) {
-                $progres = ($data['selesai_eks'] / $data['selesai']) * 100;
-                $data['presentase'] = number_format(round(min($progres, 100), 2), 2, ',', '.');
-            } else {
-                $data['presentase'] = '0,00';
-            }
-
-            // Hitung bobot nilai untuk kelas
-            if ($data['total'] > 0) {
-                $data['bobot_nilai'] = round($data['total_seluruh_poin'] / $data['total'], 2);
-            } else {
-                $data['bobot_nilai'] = 0;
-            }
-        }
-
-        return view('/eksekusi/v_eksekusi_progres', [
-            'title' => 'Perkara Eksekusi',
-            'eksekusi' => $this->EksekusiModel->allData(),
+        return view('/eksekusi/v_eksekusi_progres', array_merge($data, [
             'results' => $results,
             'kelasSatker' => $kelasSatker,
             'totalPerKelas' => $totalPerKelas,
             'eksekusi_total' => $eksekusi_total,
             'eksekusi_masuk_thn_ini' => $eksekusi_masuk_thn_ini,
             'eksekusi_bln_ini' => $eksekusi_bln_ini,
-            'startDate' => $request->start_date,
-            'endDate' => $request->end_date,
-        ]);
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ]));
     }
 
-    /**
-     * Fungsi helper untuk menghitung data eksekusi dengan filter tanggal
-     */
+    // Update fungsi helper untuk menerima parameter tanggal
     private function hitungDataEksekusi($satker, $startDate = null, $endDate = null, $kelas = null)
     {
-        // Query dasar untuk satker tertentu
-        $baseQuery = DB::table('tb_eksekusi')->where('satker', $satker);
+        // Query dasar untuk satker tertentu dengan filter tanggal
+        $query = DB::table('tb_eksekusi')->where('satker', $satker);
 
-        // Filter tanggal yang lebih robust
-        if ($startDate) {
-            $baseQuery->where('tgl_permohonan', '>=', $startDate);
-        }
-        if ($endDate) {
-            $baseQuery->where('tgl_permohonan', '<=', $endDate);
+        // Tambahkan filter tanggal jika ada
+        if ($startDate && $endDate) {
+            $query->whereBetween('tgl_permohonan', [$startDate, $endDate]);
         }
 
-        // Ambil semua data sekaligus untuk optimasi
-        $dataEksekusi = $baseQuery->get();
-        $total = $dataEksekusi->count();
+        // Hitung total eksekusi
+        $total = $query->count();
 
-        // Jika tidak ada data, return default values
-        if ($total === 0) {
-            return $this->defaultResult($kelas);
-        }
+        // Data berdasarkan putusan
+        $putusan = (clone $query)->whereNotNull('no_put')->count();
+        $ht = (clone $query)->whereNull('no_put')->count();
 
-        // Hitung data berdasarkan kondisi
-        $counts = $this->hitungBerdasarkanKondisi($dataEksekusi);
+        // Data berdasarkan proses terakhir
+        $riil = (clone $query)->where('proses_terakhir', 'Pelaksanaan Eksekusi Riil')->count();
+        $lelang = (clone $query)->where('proses_terakhir', 'Penyerahan Hasil Eksekusi/Lelang')->count();
+        $dicabut = (clone $query)->where('proses_terakhir', 'Penetapan Cabut')->count();
+        $dicoret = (clone $query)->where('proses_terakhir', 'Penetapan Coret')->count();
+        $ne = (clone $query)->where('proses_terakhir', 'Penetapan Non-Eksekutabel')->count();
 
-        // Hitung eksekusi belum selesai berdasarkan tgl_selesai
-        $blm_selesai = $dataEksekusi->filter(function ($item) {
-            return empty($item->tgl_selesai) ||
-                $item->tgl_selesai == '0000-00-00' ||
-                $item->tgl_selesai == '';
-        })->count();
+        // Hitung eksekusi belum selesai
+        $blm_selesai = (clone $query)
+            ->where(function ($q) {
+                $q->where('tgl_selesai', '0000-00-00')
+                    ->orWhereNull('tgl_selesai');
+            })
+            ->count();
 
-        // Hitung eksekusi selesai berdasarkan tgl_selesai
+        // Hitung eksekusi selesai dan sisa
         $selesai = $total - $blm_selesai;
+        $selesai_eks = $riil + $lelang;
+        $sisa = $total - $selesai;
 
-        // Hitung selesai_eks dengan bobot
-        $selesai_penuh = $counts['riil'] + $counts['lelang'];
-        $selesai_parsial = $counts['dicabut'] + $counts['dicoret'] + $counts['ne'];
-        $selesai_eks = $selesai_penuh + ($selesai_parsial * 0.5);
+        // PERBAIKAN: Hitung presentase dengan rumus yang Anda inginkan
+        $progres = 0;
+        if ($selesai > 0) {
+            $progres = ($selesai_eks / $selesai) * 100; // ($riil + $lelang) / $selesai * 100
+        }
 
-        $sisa = $blm_selesai;
-
-        // Hitung presentase
-        $progres = ($selesai > 0) ? ($selesai_eks / $selesai) * 100 : 0;
-        $progres = min($progres, 100); // Batasi maksimal 100%
         $presentase = number_format(round($progres, 2), 2, ',', '.');
 
-        // Hitung total nilai dari proses_terakhir dan bobot nilai
-        $total_nilai_proses = $this->hitungTotalNilaiProses($dataEksekusi);
-        $bobot_nilai_detail = $this->hitungBobotNilai($counts, $total_nilai_proses, $total);
+        // Hitung bobot nilai (tetap seperti sebelumnya)
+        $bobot_nilai = ($riil * 5) + ($lelang * 5) + ($dicabut * 1) + ($dicoret * 1) + ($ne * 1);
 
         return [
             'total' => $total,
-            'putusan' => $counts['putusan'],
-            'ht' => $counts['ht'],
-            'riil' => $counts['riil'],
-            'lelang' => $counts['lelang'],
-            'dicabut' => $counts['dicabut'],
-            'dicoret' => $counts['dicoret'],
-            'ne' => $counts['ne'],
+            'putusan' => $putusan,
+            'ht' => $ht,
+            'riil' => $riil,
+            'lelang' => $lelang,
+            'dicabut' => $dicabut,
+            'dicoret' => $dicoret,
+            'ne' => $ne,
             'selesai' => $selesai,
             'sisa' => $sisa,
             'presentase' => $presentase,
-            'bobot_nilai' => $bobot_nilai_detail['nilai_akhir'],
-            'bobot_nilai_detail' => $bobot_nilai_detail,
+            'bobot_nilai' => $bobot_nilai,
             'kelas' => $kelas,
-            'selesai_eks' => $selesai_eks,
-            'selesai_penuh' => $selesai_penuh,
-            'selesai_parsial' => $selesai_parsial,
-            'total_nilai_proses' => $total_nilai_proses
+            'selesai_eks' => $selesai_eks // Tambahkan ini untuk debugging
         ];
-    }
-
-    // Helper methods - defaultResult
-    private function defaultResult($kelas)
-    {
-        return [
-            'total' => 0,
-            'putusan' => 0,
-            'ht' => 0,
-            'riil' => 0,
-            'lelang' => 0,
-            'dicabut' => 0,
-            'dicoret' => 0,
-            'ne' => 0,
-            'selesai' => 0,
-            'sisa' => 0,
-            'presentase' => '0,00',
-            'bobot_nilai' => 0,
-            'bobot_nilai_detail' => [
-                'nilai_akhir' => 0,
-                'detail' => [
-                    'poin_dasar' => 0,
-                    'poin_proses' => 0,
-                    'poin_penyelesaian' => 0,
-                    'total_seluruh_poin' => 0,
-                    'jumlah_perkara' => 0
-                ]
-            ],
-            'kelas' => $kelas,
-            'selesai_eks' => 0,
-            'selesai_penuh' => 0,
-            'selesai_parsial' => 0,
-            'total_nilai_proses' => 0
-        ];
-    }
-
-    // hitungBerdasarkanKondisi
-    private function hitungBerdasarkanKondisi($dataEksekusi)
-    {
-        return [
-            'putusan' => $dataEksekusi->where('no_put', '!=', null)->count(),
-            'ht' => $dataEksekusi->where('no_put', null)->count(),
-            'riil' => $dataEksekusi->where('proses_terakhir', 'Penyerahan Hasil Eksekusi Riil')->count(),
-            'lelang' => $dataEksekusi->where('proses_terakhir', 'Penyerahan Hasil Lelang')->count(),
-            'dicabut' => $dataEksekusi->where('proses_terakhir', 'Penetapan Cabut')->count(),
-            'dicoret' => $dataEksekusi->where('proses_terakhir', 'Penetapan Coret')->count(),
-            'ne' => $dataEksekusi->where('proses_terakhir', 'Penetapan Non-Eksekutabel')->count(),
-        ];
-    }
-
-    // hitungTotalNilaiProses
-    private function hitungTotalNilaiProses($dataEksekusi)
-    {
-        return $dataEksekusi->sum(function ($data) {
-            return $this->getNilaiProsesTerakhir($data->proses_terakhir);
-        });
-    }
-
-    // SISTEM PENILAIAN BARU: hitungBobotNilai
-    private function hitungBobotNilai($counts, $total_nilai_proses, $total)
-    {
-        if ($total === 0) {
-            return [
-                'nilai_akhir' => 0,
-                'detail' => [
-                    'poin_dasar' => 0,
-                    'poin_proses' => 0,
-                    'poin_penyelesaian' => 0,
-                    'total_seluruh_poin' => 0,
-                    'jumlah_perkara' => 0
-                ]
-            ];
-        }
-
-        // A. POIN DASAR: Setiap Permohonan = 1 poin
-        $poin_dasar = $total * 1;
-
-        // B. POIN PROSES EKSEKUSI: Setiap tahap proses yang diinput = 10 poin
-        // total_nilai_proses sudah dalam skala 10-70 (sesuai mapping getNilaiProsesTerakhir)
-        // Karena mapping sudah 10-70 dan setiap tahap = 10 poin, kita gunakan langsung
-        $poin_proses = $total_nilai_proses;
-
-        // C. POIN PENYELESAIAN
-        // Selesai Penuh (Optimal): Eksekusi Riil = 30 poin, Eksekusi Lelang = 30 poin
-        $penyelesaian_penuh = ($counts['riil'] * 30) + ($counts['lelang'] * 30);
-
-        // Selesai Parsial (Administratif): Dicabut/Dicoret/Non-Eksekutabel = 5 poin masing-masing
-        $penyelesaian_parsial = ($counts['dicabut'] * 5) + ($counts['dicoret'] * 5) + ($counts['ne'] * 5);
-
-        $poin_penyelesaian = $penyelesaian_penuh + $penyelesaian_parsial;
-
-        // TOTAL SELURUH POIN: A + B + C
-        $total_seluruh_poin = $poin_dasar + $poin_proses + $poin_penyelesaian;
-
-        // D. NILAI AKHIR (Rata-rata Kinerja Per Perkara)
-        // Rumus: (A + B + C) / Jumlah Total Perkara
-        $nilai_akhir = $total_seluruh_poin / $total;
-
-        return [
-            'nilai_akhir' => round($nilai_akhir, 2),
-            'detail' => [
-                'poin_dasar' => $poin_dasar,
-                'poin_proses' => $poin_proses,
-                'poin_penyelesaian' => $poin_penyelesaian,
-                'total_seluruh_poin' => $total_seluruh_poin,
-                'jumlah_perkara' => $total
-            ]
-        ];
-    }
-
-    /**
-     * Helper function untuk mapping nilai proses_terakhir
-     */
-    private function getNilaiProsesTerakhir($prosesTerakhir)
-    {
-        $mapping = [
-            'Penetapan aanmaning' => 10,
-            'Pelaksanaan aanmaning' => 20,
-            'Penetapan Sita Eksekusi' => 30,
-            'Pelaksanaan Sita Eksekusi' => 40,
-            'Penetapan Eksekusi Lelang' => 50,
-            'Penetapan Eksekusi Riil' => 60,
-            'Pelaksanaan Eksekusi Lelang' => 60,
-            'Pelaksanaan Eksekusi Riil' => 60,
-            'Penyerahan Hasil Eksekusi Riil' => 70,
-            'Penyerahan Hasil Lelang' => 70,
-            'Penetapan Cabut' => 60,
-            'Penetapan Coret' => 60,
-            'Penetapan Non-Eksekutabel' => 60,
-            'Selesai' => 60
-        ];
-
-        return $mapping[$prosesTerakhir] ?? 0;
     }
 
     public function total_eks()

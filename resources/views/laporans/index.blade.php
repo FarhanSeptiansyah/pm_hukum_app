@@ -96,7 +96,7 @@
 
                                 @if ($data->dokumen == '')
                                 @else
-                                    <a href="\public\storage\laporans\dokumen\{{ $data->dokumen }}" class="text-blue"><i
+                                    <a href="\storage\laporans\dokumen\{{ $data->dokumen }}" class="text-blue"><i
                                             class="fa fa-file-pdf-o"></i></i></a>
                                 @endif
 
@@ -105,7 +105,7 @@
 
                                 @if ($data->konsep == '')
                                 @else
-                                    <a href="\public\storage\laporans\konsep\{{ $data->konsep }}" class="text-blue"><i
+                                    <a href="\storage\laporans\konsep\{{ $data->konsep }}" class="text-blue"><i
                                             class="fa fa-file-pdf-o"></i></i></a>
                                 @endif
 

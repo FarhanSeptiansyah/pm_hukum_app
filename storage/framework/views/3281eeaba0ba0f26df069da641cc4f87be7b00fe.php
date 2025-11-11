@@ -1,235 +1,490 @@
 <?php $__env->startSection('content'); ?>
     <?php echo $__env->make('layouts.v_deskripsi', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-    <!-- DASHBOARD RETENSI ARSIP -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- TOTAL RETENSI ARSIP -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="xe-widget xe-vertical-counter xe-vertical-counter-info animated-widget" data-count=".num"
-                    data-from="0" data-to="<?php echo e($retensi_total); ?>" data-decimal="," data-suffix="" data-duration="2.5">
-                    <div class="xe-icon">
-                        <i class="fa fa-file-text-o pulse"></i>
-                        <h4 class="widget-title">RETENSI ARSIP</h4>
-                    </div>
-                    <div class="xe-label">
-                        <a href="/retensi_total" class="text-white">
-                            <h1 class="num">0</h1>
-                        </a>
-                    </div>
-                    <div class="widget-wave"></div>
-                </div>
-            </div>
-
-            <!-- SUDAH UPLOAD -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="xe-widget xe-vertical-counter xe-vertical-counter-success animated-widget" data-count=".num"
-                    data-from="0" data-to="<?php echo e($retensi_selesai); ?>" data-decimal="," data-suffix="" data-duration="2.5">
-                    <div class="xe-icon">
-                        <i class="fa fa-file-text-o bounce"></i>
-                        <h4 class="widget-title">SUDAH UPLOAD</h4>
-                    </div>
-                    <div class="xe-label">
-                        <a href="/retensi_sdh" class="text-white">
-                            <h1 class="num">0</h1>
-                        </a>
-                    </div>
-                    <div class="widget-wave"></div>
-                </div>
-            </div>
-
-            <!-- BELUM UPLOAD -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="xe-widget xe-vertical-counter xe-vertical-counter-danger animated-widget" data-count=".num"
-                    data-from="0" data-to="<?php echo e($retensi_blm_selesai); ?>" data-decimal="," data-suffix="" data-duration="2.5">
-                    <div class="xe-icon">
-                        <i class="fa fa-file-text-o shake"></i>
-                        <h4 class="widget-title">BELUM UPLOAD</h4>
-                    </div>
-                    <div class="xe-label">
-                        <a href="/retensi_blm" class="text-white">
-                            <h1 class="num">0</h1>
-                        </a>
-                    </div>
-                    <div class="widget-wave"></div>
-                </div>
-            </div>
-
-            <!-- PROGRESS PERSENTASE -->
-            <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                <div class="xe-widget xe-vertical-counter xe-vertical-counter-warning animated-widget" data-count=".num"
-                    data-from="0" data-to="<?php echo e($retensi_presentase); ?>" data-decimal="," data-suffix="%" data-duration="2.5">
-                    <div class="xe-icon">
-                        <i class="fa fa-percent rotate"></i>
-                        <h4 class="widget-title">PROGRESS UPLOAD</h4>
-                    </div>
-                    <div class="xe-label">
-                        <div class="text-white">
-                            <h1 class="num">0</h1>
+    <?php if(Auth::user()->level === 1): ?>
+        <!-- DASHBOARD RETENSI ARSIP -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- TOTAL RETENSI ARSIP -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-info animated-widget" data-count=".num"
+                        data-from="0" data-to="<?php echo e($retensi_total); ?>" data-decimal="," data-suffix="" data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o pulse"></i>
+                            <h4 class="widget-title">RETENSI ARSIP</h4>
                         </div>
+                        <div class="xe-label">
+                            <a href="/retensi_total" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
                     </div>
-                    <div class="widget-wave"></div>
                 </div>
-            </div>
-        </div>
 
-        <!-- REKAP DATA BERDASARKAN TAHUN DALAM BENTUK TABEL -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary">
-                        <h3 class="card-title text-white">
-                            </i>REKAP DATA BERDASARKAN TAHUN
-                        </h3>
+                <!-- SUDAH UPLOAD -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-success animated-widget" data-count=".num"
+                        data-from="0" data-to="<?php echo e($retensi_selesai); ?>" data-decimal="," data-suffix="" data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o bounce"></i>
+                            <h4 class="widget-title">SUDAH UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <a href="/retensi_sdh" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-hover mb-0">
-                                <thead class="bg-gradient-primary text-white">
-                                    <tr>
-                                        <th width="5%" class="text-center align-middle">No</th>
-                                        <th width="15%" class="text-center align-middle">Tahun</th>
-                                        <th width="15%" class="text-center align-middle">Total Data</th>
-                                        <th width="15%" class="text-center align-middle">Sudah Upload</th>
-                                        <th width="15%" class="text-center align-middle">Belum Upload</th>
-                                        <th width="35%" class="text-center align-middle">Progress Upload</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $__currentLoopData = $rekap_tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rekap): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <?php
-                                            $progress =
-                                                $rekap->total > 0 ? round(($rekap->selesai / $rekap->total) * 100) : 0;
-                                        ?>
-                                        <tr>
-                                            <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
-                                            <td class="text-center align-middle">
-                                                <a href="<?php echo e(route('retensi.by_year', ['tahun' => $rekap->tahun])); ?>"
-                                                    class="btn btn-outline-primary btn-sm font-weight-bold">
-                                                    </i><?php echo e($rekap->tahun); ?>
+                </div>
 
-                                                </a>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge badge-info badge-lg">
-                                                    <?php echo e(number_format($rekap->total)); ?> Data
-                                                </span>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge badge-success badge-lg">
-                                                    <?php echo e(number_format($rekap->selesai)); ?> Data
-                                                </span>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge badge-danger badge-lg">
-                                                    <?php echo e(number_format($rekap->belum_selesai)); ?> Data
-                                                </span>
-                                            </td>
-                                            <td class="align-middle">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="progress-wrapper flex-grow-1 mr-3">
-                                                        <div class="progress" style="height: 20px; border-radius: 10px;">
-                                                            <div class="progress-bar progress-bar-striped progress-bar-animated
+                <!-- BELUM UPLOAD -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-danger animated-widget" data-count=".num"
+                        data-from="0" data-to="<?php echo e($retensi_blm_selesai); ?>" data-decimal="," data-suffix=""
+                        data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o shake"></i>
+                            <h4 class="widget-title">BELUM UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <a href="/retensi_blm" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS PERSENTASE -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-warning animated-widget" data-count=".num"
+                        data-from="0" data-to="<?php echo e($retensi_presentase); ?>" data-decimal="," data-suffix="%"
+                        data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-percent rotate"></i>
+                            <h4 class="widget-title">PROGRESS UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <div class="text-white">
+                                <h1 class="num">0</h1>
+                            </div>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h3 class="card-title text-primary text-center">
+                                    </i>REKAP DATA BERDASARKAN TAHUN
+                                </h3>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover mb-0">
+                                        <thead class="bg-info text-white">
+                                            <tr>
+                                                <th width="5%" class="text-center align-middle">No</th>
+                                                <th width="15%" class="text-center align-middle">Tahun</th>
+                                                <th width="15%" class="text-center align-middle">Total Data</th>
+                                                <th width="15%" class="text-center align-middle">Sudah Upload</th>
+                                                <th width="15%" class="text-center align-middle">Belum Upload</th>
+                                                <th width="35%" class="text-center align-middle">Progress Upload</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $__currentLoopData = $rekap_tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rekap): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
+                                                    $progress =
+                                                        $rekap->total > 0
+                                                            ? round(($rekap->selesai / $rekap->total) * 100)
+                                                            : 0;
+                                                ?>
+                                                <tr>
+                                                    <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
+                                                    <td class="text-center align-middle">
+                                                        <a href="<?php echo e(route('retensi.by_year', ['tahun' => $rekap->tahun])); ?>"
+                                                            class="btn btn-outline-primary btn-sm font-weight-bold">
+                                                            </i><?php echo e($rekap->tahun); ?>
+
+                                                        </a>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-info btn-xs">
+                                                            <?php echo e(number_format($rekap->total)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-success btn-xs">
+                                                            <?php echo e(number_format($rekap->selesai)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-danger btn-xs">
+                                                            <?php echo e(number_format($rekap->belum_selesai)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="progress-wrapper flex-grow-1 mr-3">
+                                                                <div class="progress"
+                                                                    style="height: 20px; border-radius: 10px;">
+                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
                                                             <?php if($progress >= 80): ?> bg-success
                                                             <?php elseif($progress >= 50): ?> bg-warning
                                                             <?php else: ?> bg-danger <?php endif; ?>"
-                                                                role="progressbar"
-                                                                style="width: <?php echo e($progress); ?>%; border-radius: 10px;"
-                                                                aria-valuenow="<?php echo e($progress); ?>" aria-valuemin="0"
-                                                                aria-valuemax="100">
+                                                                        role="progressbar"
+                                                                        style="width: <?php echo e($progress); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress); ?>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="progress-text">
-                                                        <span
-                                                            class="font-weight-bold
+                                                            <div class="progress-text">
+                                                                <span
+                                                                    class="font-weight-bold
                                                         <?php if($progress >= 80): ?> text-success
                                                         <?php elseif($progress >= 50): ?> text-warning
                                                         <?php else: ?> text-danger <?php endif; ?>"
-                                                            style="font-size: 14px; min-width: 45px; display: inline-block;">
-                                                            <?php echo e($progress); ?>%
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                    style="font-size: 14px; min-width: 45px; display: inline-block;">
+                                                                    <?php echo e($progress); ?>%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                    <?php if($rekap_tahun->isEmpty()): ?>
-                                        <tr>
-                                            <td colspan="6" class="text-center py-4">
-                                                <div class="alert alert-info mb-0">
-                                                    <i class="fa fa-info-circle mr-2"></i> Belum ada data untuk direkap.
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                                <?php if(!$rekap_tahun->isEmpty()): ?>
-                                    <tfoot class="bg-light">
-                                        <tr>
-                                            <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN</th>
-                                            <th class="text-center align-middle">
-                                                <span class="badge badge-dark badge-lg">
-                                                    <?php echo e(number_format($rekap_tahun->sum('total'))); ?> Data
-                                                </span>
-                                            </th>
-                                            <th class="text-center align-middle">
-                                                <span class="badge badge-dark badge-lg">
-                                                    <?php echo e(number_format($rekap_tahun->sum('selesai'))); ?> Data
-                                                </span>
-                                            </th>
-                                            <th class="text-center align-middle">
-                                                <span class="badge badge-dark badge-lg">
-                                                    <?php echo e(number_format($rekap_tahun->sum('belum_selesai'))); ?> Data
-                                                </span>
-                                            </th>
-                                            <th class="text-center align-middle">
-                                                <?php
-                                                    $total_keseluruhan = $rekap_tahun->sum('total');
-                                                    $selesai_keseluruhan = $rekap_tahun->sum('selesai');
-                                                    $progress_keseluruhan =
-                                                        $total_keseluruhan > 0
-                                                            ? round(($selesai_keseluruhan / $total_keseluruhan) * 100)
-                                                            : 0;
-                                                ?>
-                                                <div class="d-flex align-items-center justify-content-center">
-                                                    <div class="progress-wrapper flex-grow-1 mr-3"
-                                                        style="max-width: 200px;">
-                                                        <div class="progress" style="height: 20px; border-radius: 10px;">
-                                                            <div class="progress-bar progress-bar-striped progress-bar-animated
+                                            <?php if($rekap_tahun->isEmpty()): ?>
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-4">
+                                                        <div class="alert alert-info mb-0">
+                                                            <i class="fa fa-info-circle mr-2"></i> Belum ada data untuk
+                                                            direkap.
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                        <?php if(!$rekap_tahun->isEmpty()): ?>
+                                            <tfoot class="bg-light">
+                                                <tr>
+                                                    <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('total'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('belum_selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <?php
+                                                            $total_keseluruhan = $rekap_tahun->sum('total');
+                                                            $selesai_keseluruhan = $rekap_tahun->sum('selesai');
+                                                            $progress_keseluruhan =
+                                                                $total_keseluruhan > 0
+                                                                    ? round(
+                                                                        ($selesai_keseluruhan / $total_keseluruhan) *
+                                                                            100,
+                                                                    )
+                                                                    : 0;
+                                                        ?>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <div class="progress-wrapper flex-grow-1 mr-3"
+                                                                style="max-width: 200px;">
+                                                                <div class="progress"
+                                                                    style="height: 20px; border-radius: 10px;">
+                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
                                                             <?php if($progress_keseluruhan >= 80): ?> bg-success
                                                             <?php elseif($progress_keseluruhan >= 50): ?> bg-warning
                                                             <?php else: ?> bg-danger <?php endif; ?>"
-                                                                role="progressbar"
-                                                                style="width: <?php echo e($progress_keseluruhan); ?>%; border-radius: 10px;"
-                                                                aria-valuenow="<?php echo e($progress_keseluruhan); ?>"
-                                                                aria-valuemin="0" aria-valuemax="100">
+                                                                        role="progressbar"
+                                                                        style="width: <?php echo e($progress_keseluruhan); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress_keseluruhan); ?>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="progress-text">
-                                                        <span
-                                                            class="font-weight-bold
+                                                            <div class="progress-text">
+                                                                <span
+                                                                    class="font-weight-bold
                                                         <?php if($progress_keseluruhan >= 80): ?> text-success
                                                         <?php elseif($progress_keseluruhan >= 50): ?> text-warning
                                                         <?php else: ?> text-danger <?php endif; ?>"
-                                                            style="font-size: 16px; min-width: 50px; display: inline-block;">
-                                                            <?php echo e($progress_keseluruhan); ?>%
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                        </tr>
-                                    </tfoot>
-                                <?php endif; ?>
-                            </table>
+                                                                    style="font-size: 16px; min-width: 50px; display: inline-block;">
+                                                                    <?php echo e($progress_keseluruhan); ?>%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        <?php endif; ?>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    <?php elseif(Auth::user()->level === 2): ?>
+        <!-- DASHBOARD RETENSI ARSIP -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- TOTAL RETENSI ARSIP -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-info animated-widget" data-count=".num"
+                        data-from="0" data-to="<?php echo e($retensi_total); ?>" data-decimal="," data-suffix=""
+                        data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o pulse"></i>
+                            <h4 class="widget-title">RETENSI ARSIP</h4>
+                        </div>
+                        <div class="xe-label">
+                            <a href="/retensi_total" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+
+                <!-- SUDAH UPLOAD -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-success animated-widget"
+                        data-count=".num" data-from="0" data-to="<?php echo e($retensi_selesai); ?>" data-decimal=","
+                        data-suffix="" data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o bounce"></i>
+                            <h4 class="widget-title">SUDAH UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <a href="/retensi_sdh" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+
+                <!-- BELUM UPLOAD -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-danger animated-widget"
+                        data-count=".num" data-from="0" data-to="<?php echo e($retensi_blm_selesai); ?>" data-decimal=","
+                        data-suffix="" data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-file-text-o shake"></i>
+                            <h4 class="widget-title">BELUM UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <a href="/retensi_blm" class="text-white">
+                                <h1 class="num">0</h1>
+                            </a>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+
+                <!-- PROGRESS PERSENTASE -->
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-warning animated-widget"
+                        data-count=".num" data-from="0" data-to="<?php echo e($retensi_presentase); ?>" data-decimal=","
+                        data-suffix="%" data-duration="2.5">
+                        <div class="xe-icon">
+                            <i class="fa fa-percent rotate"></i>
+                            <h4 class="widget-title">PROGRESS UPLOAD</h4>
+                        </div>
+                        <div class="xe-label">
+                            <div class="text-white">
+                                <h1 class="num">0</h1>
+                            </div>
+                        </div>
+                        <div class="widget-wave"></div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h3 class="card-title text-primary text-center">
+                                    </i>REKAP DATA BERDASARKAN TAHUN
+                                </h3>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover mb-0">
+                                        <thead class="bg-info text-white">
+                                            <tr>
+                                                <th width="5%" class="text-center align-middle">No</th>
+                                                <th width="15%" class="text-center align-middle">Tahun</th>
+                                                <th width="15%" class="text-center align-middle">Total Data</th>
+                                                <th width="15%" class="text-center align-middle">Sudah Upload</th>
+                                                <th width="15%" class="text-center align-middle">Belum Upload</th>
+                                                <th width="35%" class="text-center align-middle">Progress Upload</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $__currentLoopData = $rekap_tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rekap): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
+                                                    $progress =
+                                                        $rekap->total > 0
+                                                            ? round(($rekap->selesai / $rekap->total) * 100)
+                                                            : 0;
+                                                ?>
+                                                <tr>
+                                                    <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
+                                                    <td class="text-center align-middle">
+                                                        <a href="<?php echo e(route('retensi.by_year', ['tahun' => $rekap->tahun])); ?>"
+                                                            class="btn btn-outline-primary btn-sm font-weight-bold">
+                                                            </i><?php echo e($rekap->tahun); ?>
+
+                                                        </a>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-info btn-xs">
+                                                            <?php echo e(number_format($rekap->total)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-success btn-xs">
+                                                            <?php echo e(number_format($rekap->selesai)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-danger btn-xs">
+                                                            <?php echo e(number_format($rekap->belum_selesai)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="progress-wrapper flex-grow-1 mr-3">
+                                                                <div class="progress"
+                                                                    style="height: 20px; border-radius: 10px;">
+                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
+                                                            <?php if($progress >= 80): ?> bg-success
+                                                            <?php elseif($progress >= 50): ?> bg-warning
+                                                            <?php else: ?> bg-danger <?php endif; ?>"
+                                                                        role="progressbar"
+                                                                        style="width: <?php echo e($progress); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress); ?>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="progress-text">
+                                                                <span
+                                                                    class="font-weight-bold
+                                                        <?php if($progress >= 80): ?> text-success
+                                                        <?php elseif($progress >= 50): ?> text-warning
+                                                        <?php else: ?> text-danger <?php endif; ?>"
+                                                                    style="font-size: 14px; min-width: 45px; display: inline-block;">
+                                                                    <?php echo e($progress); ?>%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                            <?php if($rekap_tahun->isEmpty()): ?>
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-4">
+                                                        <div class="alert alert-info mb-0">
+                                                            <i class="fa fa-info-circle mr-2"></i> Belum ada data untuk
+                                                            direkap.
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                        <?php if(!$rekap_tahun->isEmpty()): ?>
+                                            <tfoot class="bg-light">
+                                                <tr>
+                                                    <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('total'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('belum_selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <?php
+                                                            $total_keseluruhan = $rekap_tahun->sum('total');
+                                                            $selesai_keseluruhan = $rekap_tahun->sum('selesai');
+                                                            $progress_keseluruhan =
+                                                                $total_keseluruhan > 0
+                                                                    ? round(
+                                                                        ($selesai_keseluruhan / $total_keseluruhan) *
+                                                                            100,
+                                                                    )
+                                                                    : 0;
+                                                        ?>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <div class="progress-wrapper flex-grow-1 mr-3"
+                                                                style="max-width: 200px;">
+                                                                <div class="progress"
+                                                                    style="height: 20px; border-radius: 10px;">
+                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
+                                                            <?php if($progress_keseluruhan >= 80): ?> bg-success
+                                                            <?php elseif($progress_keseluruhan >= 50): ?> bg-warning
+                                                            <?php else: ?> bg-danger <?php endif; ?>"
+                                                                        role="progressbar"
+                                                                        style="width: <?php echo e($progress_keseluruhan); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress_keseluruhan); ?>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="progress-text">
+                                                                <span
+                                                                    class="font-weight-bold
+                                                        <?php if($progress_keseluruhan >= 80): ?> text-success
+                                                        <?php elseif($progress_keseluruhan >= 50): ?> text-warning
+                                                        <?php else: ?> text-danger <?php endif; ?>"
+                                                                    style="font-size: 16px; min-width: 50px; display: inline-block;">
+                                                                    <?php echo e($progress_keseluruhan); ?>%
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        <?php endif; ?>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php elseif(Auth::user()->level === 3): ?>
+    <?php endif; ?>
+
+
 
     <style>
         /* Base Styles untuk card */

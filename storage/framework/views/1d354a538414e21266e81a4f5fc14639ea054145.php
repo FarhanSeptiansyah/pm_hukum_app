@@ -1,22 +1,126 @@
-@extends('layouts.v_template')
+<?php $__env->startSection('content'); ?>
+    <?php echo $__env->make('layouts.v_deskripsi', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-@section('content')
-    @include('layouts.v_deskripsi')
-
-    @if (Auth::user()->level === 1)
-        <!-- DASHBOARD RETENSI ARSIP -->
+    <?php if(Auth::user()->level === 1): ?>
+        <!-- DASHBOARD KASASI PERKARA -->
         <div class="container-fluid">
             <div class="row">
-                <!-- TOTAL RETENSI ARSIP -->
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h3 class="card-title text-primary text-center">
+                                    </i>REKAP DATA DOKUMEN PERKARA KASASI
+                                </h3>
+                            </div>
+                            <div class="card-body p-0">
+                                <div>
+                                    <a href="/kasasi_total" type="button" class="btn btn-secondary btn-sm">Tampilkan semua
+                                        data</a>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-hover mb-0">
+                                        <thead class="bg-info text-white">
+                                            <tr>
+                                                <th width="5%" class="text-center align-middle">No</th>
+                                                <th width="15%" class="text-center align-middle">Tahun</th>
+                                                <th width="15%" class="text-center align-middle">Total Data</th>
+                                                <th width="15%" class="text-center align-middle">Sudah Upload</th>
+                                                <th width="15%" class="text-center align-middle">Belum Upload</th>
+                                        </thead>
+                                        <tbody>
+                                            <?php $__currentLoopData = $rekap_tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rekap): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
+                                                    $progress =
+                                                        $rekap->total > 0
+                                                            ? round(($rekap->selesai / $rekap->total) * 100)
+                                                            : 0;
+                                                ?>
+                                                <tr>
+                                                    <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
+                                                    <td class="text-center align-middle">
+                                                        <a href="<?php echo e(route('kasasi.by_year', ['tahun' => $rekap->tahun])); ?>"
+                                                            class="btn btn-outline-primary btn-sm font-weight-bold">
+                                                            </i><?php echo e($rekap->tahun); ?>
+
+                                                        </a>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-info btn-xs">
+                                                            <?php echo e(number_format($rekap->total)); ?> Perkara
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-success btn-xs">
+                                                            <?php echo e(number_format($rekap->selesai)); ?> Dokumen
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <span class="btn btn-danger btn-xs">
+                                                            <?php echo e(number_format($rekap->belum_selesai)); ?> Dokumen
+                                                        </span>
+                                                    </td>
+
+                                                </tr>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                                            <?php if($rekap_tahun->isEmpty()): ?>
+                                                <tr>
+                                                    <td colspan="6" class="text-center py-4">
+                                                        <div class="alert alert-info mb-0">
+                                                            <i class="fa fa-info-circle mr-2"></i> Belum ada data untuk
+                                                            direkap.
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        </tbody>
+                                        <?php if(!$rekap_tahun->isEmpty()): ?>
+                                            <tfoot class="bg-light">
+                                                <tr>
+                                                    <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('total'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                    <th class="text-center align-middle">
+                                                        <span class="btn btn-primary btn-xs">
+                                                            <?php echo e(number_format($rekap_tahun->sum('belum_selesai'))); ?> Perkara
+                                                        </span>
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        <?php endif; ?>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php elseif(Auth::user()->level === 2): ?>
+        <!-- DASHBOARD KASASI PERKARA -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- TOTAL KASASI PERKARA -->
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div class="xe-widget xe-vertical-counter xe-vertical-counter-info animated-widget" data-count=".num"
-                        data-from="0" data-to="{{ $retensi_total }}" data-decimal="," data-suffix="" data-duration="2.5">
+                        data-from="0" data-to="<?php echo e($kasasi_total); ?>" data-decimal="," data-suffix="" data-duration="2.5">
                         <div class="xe-icon">
                             <i class="fa fa-file-text-o pulse"></i>
-                            <h4 class="widget-title">RETENSI ARSIP</h4>
+                            <h4 class="widget-title">KASASI PERKARA</h4>
                         </div>
                         <div class="xe-label">
-                            <a href="/retensi_total" class="text-white">
+                            <a href="/kasasi_total" class="text-white">
                                 <h1 class="num">0</h1>
                             </a>
                         </div>
@@ -24,16 +128,16 @@
                     </div>
                 </div>
 
-                <!-- SUDAH UPLOAD -->
+                <!-- SUDAH SELESAI -->
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div class="xe-widget xe-vertical-counter xe-vertical-counter-success animated-widget" data-count=".num"
-                        data-from="0" data-to="{{ $retensi_selesai }}" data-decimal="," data-suffix="" data-duration="2.5">
+                        data-from="0" data-to="<?php echo e($kasasi_selesai); ?>" data-decimal="," data-suffix="" data-duration="2.5">
                         <div class="xe-icon">
                             <i class="fa fa-file-text-o bounce"></i>
-                            <h4 class="widget-title">SUDAH UPLOAD</h4>
+                            <h4 class="widget-title">SUDAH SELESAI</h4>
                         </div>
                         <div class="xe-label">
-                            <a href="/retensi_sdh" class="text-white">
+                            <a href="/kasasi_sdh" class="text-white">
                                 <h1 class="num">0</h1>
                             </a>
                         </div>
@@ -41,17 +145,17 @@
                     </div>
                 </div>
 
-                <!-- BELUM UPLOAD -->
+                <!-- BELUM SELESAI -->
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div class="xe-widget xe-vertical-counter xe-vertical-counter-danger animated-widget" data-count=".num"
-                        data-from="0" data-to="{{ $retensi_blm_selesai }}" data-decimal="," data-suffix=""
+                        data-from="0" data-to="<?php echo e($kasasi_blm_selesai); ?>" data-decimal="," data-suffix=""
                         data-duration="2.5">
                         <div class="xe-icon">
                             <i class="fa fa-file-text-o shake"></i>
-                            <h4 class="widget-title">BELUM UPLOAD</h4>
+                            <h4 class="widget-title">BELUM SELESAI</h4>
                         </div>
                         <div class="xe-label">
-                            <a href="/retensi_blm" class="text-white">
+                            <a href="/kasasi_blm" class="text-white">
                                 <h1 class="num">0</h1>
                             </a>
                         </div>
@@ -62,11 +166,11 @@
                 <!-- PROGRESS PERSENTASE -->
                 <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
                     <div class="xe-widget xe-vertical-counter xe-vertical-counter-warning animated-widget" data-count=".num"
-                        data-from="0" data-to="{{ $retensi_presentase }}" data-decimal="," data-suffix="%"
+                        data-from="0" data-to="<?php echo e($kasasi_presentase); ?>" data-decimal="," data-suffix="%"
                         data-duration="2.5">
                         <div class="xe-icon">
                             <i class="fa fa-percent rotate"></i>
-                            <h4 class="widget-title">PROGRESS UPLOAD</h4>
+                            <h4 class="widget-title">PROGRESS SELESAI</h4>
                         </div>
                         <div class="xe-label">
                             <div class="text-white">
@@ -92,40 +196,41 @@
                                                 <th width="5%" class="text-center align-middle">No</th>
                                                 <th width="15%" class="text-center align-middle">Tahun</th>
                                                 <th width="15%" class="text-center align-middle">Total Data</th>
-                                                <th width="15%" class="text-center align-middle">Sudah Upload</th>
-                                                <th width="15%" class="text-center align-middle">Belum Upload</th>
-                                                <th width="35%" class="text-center align-middle">Progress Upload</th>
+                                                <th width="15%" class="text-center align-middle">Sudah Selesai</th>
+                                                <th width="15%" class="text-center align-middle">Belum Selesai</th>
+                                                <th width="35%" class="text-center align-middle">Progress Selesai</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($rekap_tahun as $index => $rekap)
-                                                @php
+                                            <?php $__currentLoopData = $rekap_tahun; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rekap): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php
                                                     $progress =
                                                         $rekap->total > 0
                                                             ? round(($rekap->selesai / $rekap->total) * 100)
                                                             : 0;
-                                                @endphp
+                                                ?>
                                                 <tr>
-                                                    <td class="text-center align-middle">{{ $index + 1 }}</td>
+                                                    <td class="text-center align-middle"><?php echo e($index + 1); ?></td>
                                                     <td class="text-center align-middle">
-                                                        <a href="{{ route('retensi.by_year', ['tahun' => $rekap->tahun]) }}"
+                                                        <a href="<?php echo e(route('kasasi.by_year', ['tahun' => $rekap->tahun])); ?>"
                                                             class="btn btn-outline-primary btn-sm font-weight-bold">
-                                                            </i>{{ $rekap->tahun }}
+                                                            </i><?php echo e($rekap->tahun); ?>
+
                                                         </a>
                                                     </td>
                                                     <td class="text-center align-middle">
                                                         <span class="btn btn-info btn-xs">
-                                                            {{ number_format($rekap->total) }} Perkara
+                                                            <?php echo e(number_format($rekap->total)); ?> Perkara
                                                         </span>
                                                     </td>
                                                     <td class="text-center align-middle">
                                                         <span class="btn btn-success btn-xs">
-                                                            {{ number_format($rekap->selesai) }} Perkara
+                                                            <?php echo e(number_format($rekap->selesai)); ?> Perkara
                                                         </span>
                                                     </td>
                                                     <td class="text-center align-middle">
                                                         <span class="btn btn-danger btn-xs">
-                                                            {{ number_format($rekap->belum_selesai) }} Perkara
+                                                            <?php echo e(number_format($rekap->belum_selesai)); ?> Perkara
                                                         </span>
                                                     </td>
                                                     <td class="align-middle">
@@ -134,12 +239,12 @@
                                                                 <div class="progress"
                                                                     style="height: 20px; border-radius: 10px;">
                                                                     <div class="progress-bar progress-bar-striped progress-bar-animated
-                                                            @if ($progress >= 80) bg-success
-                                                            @elseif($progress >= 50) bg-warning
-                                                            @else bg-danger @endif"
+                                                            <?php if($progress >= 80): ?> bg-success
+                                                            <?php elseif($progress >= 50): ?> bg-warning
+                                                            <?php else: ?> bg-danger <?php endif; ?>"
                                                                         role="progressbar"
-                                                                        style="width: {{ $progress }}%; border-radius: 10px;"
-                                                                        aria-valuenow="{{ $progress }}"
+                                                                        style="width: <?php echo e($progress); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress); ?>"
                                                                         aria-valuemin="0" aria-valuemax="100">
                                                                     </div>
                                                                 </div>
@@ -147,19 +252,19 @@
                                                             <div class="progress-text">
                                                                 <span
                                                                     class="font-weight-bold
-                                                        @if ($progress >= 80) text-success
-                                                        @elseif($progress >= 50) text-warning
-                                                        @else text-danger @endif"
+                                                        <?php if($progress >= 80): ?> text-success
+                                                        <?php elseif($progress >= 50): ?> text-warning
+                                                        <?php else: ?> text-danger <?php endif; ?>"
                                                                     style="font-size: 14px; min-width: 45px; display: inline-block;">
-                                                                    {{ $progress }}%
+                                                                    <?php echo e($progress); ?>%
                                                                 </span>
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                            @if ($rekap_tahun->isEmpty())
+                                            <?php if($rekap_tahun->isEmpty()): ?>
                                                 <tr>
                                                     <td colspan="6" class="text-center py-4">
                                                         <div class="alert alert-info mb-0">
@@ -168,30 +273,30 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endif
+                                            <?php endif; ?>
                                         </tbody>
-                                        @if (!$rekap_tahun->isEmpty())
+                                        <?php if(!$rekap_tahun->isEmpty()): ?>
                                             <tfoot class="bg-light">
                                                 <tr>
                                                     <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN
                                                     </th>
                                                     <th class="text-center align-middle">
                                                         <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('total')) }} Perkara
+                                                            <?php echo e(number_format($rekap_tahun->sum('total'))); ?> Perkara
                                                         </span>
                                                     </th>
                                                     <th class="text-center align-middle">
                                                         <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('selesai')) }} Perkara
+                                                            <?php echo e(number_format($rekap_tahun->sum('selesai'))); ?> Perkara
                                                         </span>
                                                     </th>
                                                     <th class="text-center align-middle">
                                                         <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('belum_selesai')) }} Perkara
+                                                            <?php echo e(number_format($rekap_tahun->sum('belum_selesai'))); ?> Perkara
                                                         </span>
                                                     </th>
                                                     <th class="text-center align-middle">
-                                                        @php
+                                                        <?php
                                                             $total_keseluruhan = $rekap_tahun->sum('total');
                                                             $selesai_keseluruhan = $rekap_tahun->sum('selesai');
                                                             $progress_keseluruhan =
@@ -201,19 +306,19 @@
                                                                             100,
                                                                     )
                                                                     : 0;
-                                                        @endphp
+                                                        ?>
                                                         <div class="d-flex align-items-center justify-content-center">
                                                             <div class="progress-wrapper flex-grow-1 mr-3"
                                                                 style="max-width: 200px;">
                                                                 <div class="progress"
                                                                     style="height: 20px; border-radius: 10px;">
                                                                     <div class="progress-bar progress-bar-striped progress-bar-animated
-                                                            @if ($progress_keseluruhan >= 80) bg-success
-                                                            @elseif($progress_keseluruhan >= 50) bg-warning
-                                                            @else bg-danger @endif"
+                                                            <?php if($progress_keseluruhan >= 80): ?> bg-success
+                                                            <?php elseif($progress_keseluruhan >= 50): ?> bg-warning
+                                                            <?php else: ?> bg-danger <?php endif; ?>"
                                                                         role="progressbar"
-                                                                        style="width: {{ $progress_keseluruhan }}%; border-radius: 10px;"
-                                                                        aria-valuenow="{{ $progress_keseluruhan }}"
+                                                                        style="width: <?php echo e($progress_keseluruhan); ?>%; border-radius: 10px;"
+                                                                        aria-valuenow="<?php echo e($progress_keseluruhan); ?>"
                                                                         aria-valuemin="0" aria-valuemax="100">
                                                                     </div>
                                                                 </div>
@@ -221,18 +326,18 @@
                                                             <div class="progress-text">
                                                                 <span
                                                                     class="font-weight-bold
-                                                        @if ($progress_keseluruhan >= 80) text-success
-                                                        @elseif($progress_keseluruhan >= 50) text-warning
-                                                        @else text-danger @endif"
+                                                        <?php if($progress_keseluruhan >= 80): ?> text-success
+                                                        <?php elseif($progress_keseluruhan >= 50): ?> text-warning
+                                                        <?php else: ?> text-danger <?php endif; ?>"
                                                                     style="font-size: 16px; min-width: 50px; display: inline-block;">
-                                                                    {{ $progress_keseluruhan }}%
+                                                                    <?php echo e($progress_keseluruhan); ?>%
                                                                 </span>
                                                             </div>
                                                         </div>
                                                     </th>
                                                 </tr>
                                             </tfoot>
-                                        @endif
+                                        <?php endif; ?>
                                     </table>
                                 </div>
                             </div>
@@ -241,250 +346,8 @@
                 </div>
             </div>
         </div>
-    @elseif(Auth::user()->level === 2)
-        <!-- DASHBOARD RETENSI ARSIP -->
-        <div class="container-fluid">
-            <div class="row">
-                <!-- TOTAL RETENSI ARSIP -->
-                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-info animated-widget" data-count=".num"
-                        data-from="0" data-to="{{ $retensi_total }}" data-decimal="," data-suffix=""
-                        data-duration="2.5">
-                        <div class="xe-icon">
-                            <i class="fa fa-file-text-o pulse"></i>
-                            <h4 class="widget-title">RETENSI ARSIP</h4>
-                        </div>
-                        <div class="xe-label">
-                            <a href="/retensi_total" class="text-white">
-                                <h1 class="num">0</h1>
-                            </a>
-                        </div>
-                        <div class="widget-wave"></div>
-                    </div>
-                </div>
-
-                <!-- SUDAH UPLOAD -->
-                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-success animated-widget"
-                        data-count=".num" data-from="0" data-to="{{ $retensi_selesai }}" data-decimal=","
-                        data-suffix="" data-duration="2.5">
-                        <div class="xe-icon">
-                            <i class="fa fa-file-text-o bounce"></i>
-                            <h4 class="widget-title">SUDAH UPLOAD</h4>
-                        </div>
-                        <div class="xe-label">
-                            <a href="/retensi_sdh" class="text-white">
-                                <h1 class="num">0</h1>
-                            </a>
-                        </div>
-                        <div class="widget-wave"></div>
-                    </div>
-                </div>
-
-                <!-- BELUM UPLOAD -->
-                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-danger animated-widget"
-                        data-count=".num" data-from="0" data-to="{{ $retensi_blm_selesai }}" data-decimal=","
-                        data-suffix="" data-duration="2.5">
-                        <div class="xe-icon">
-                            <i class="fa fa-file-text-o shake"></i>
-                            <h4 class="widget-title">BELUM UPLOAD</h4>
-                        </div>
-                        <div class="xe-label">
-                            <a href="/retensi_blm" class="text-white">
-                                <h1 class="num">0</h1>
-                            </a>
-                        </div>
-                        <div class="widget-wave"></div>
-                    </div>
-                </div>
-
-                <!-- PROGRESS PERSENTASE -->
-                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="xe-widget xe-vertical-counter xe-vertical-counter-warning animated-widget"
-                        data-count=".num" data-from="0" data-to="{{ $retensi_presentase }}" data-decimal=","
-                        data-suffix="%" data-duration="2.5">
-                        <div class="xe-icon">
-                            <i class="fa fa-percent rotate"></i>
-                            <h4 class="widget-title">PROGRESS UPLOAD</h4>
-                        </div>
-                        <div class="xe-label">
-                            <div class="text-white">
-                                <h1 class="num">0</h1>
-                            </div>
-                        </div>
-                        <div class="widget-wave"></div>
-                    </div>
-                </div>
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header bg-white">
-                                <h3 class="card-title text-primary text-center">
-                                    </i>REKAP DATA BERDASARKAN TAHUN
-                                </h3>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-hover mb-0">
-                                        <thead class="bg-info text-white">
-                                            <tr>
-                                                <th width="5%" class="text-center align-middle">No</th>
-                                                <th width="15%" class="text-center align-middle">Tahun</th>
-                                                <th width="15%" class="text-center align-middle">Total Data</th>
-                                                <th width="15%" class="text-center align-middle">Sudah Upload</th>
-                                                <th width="15%" class="text-center align-middle">Belum Upload</th>
-                                                <th width="35%" class="text-center align-middle">Progress Upload</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($rekap_tahun as $index => $rekap)
-                                                @php
-                                                    $progress =
-                                                        $rekap->total > 0
-                                                            ? round(($rekap->selesai / $rekap->total) * 100)
-                                                            : 0;
-                                                @endphp
-                                                <tr>
-                                                    <td class="text-center align-middle">{{ $index + 1 }}</td>
-                                                    <td class="text-center align-middle">
-                                                        <a href="{{ route('retensi.by_year', ['tahun' => $rekap->tahun]) }}"
-                                                            class="btn btn-outline-primary btn-sm font-weight-bold">
-                                                            </i>{{ $rekap->tahun }}
-                                                        </a>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <span class="btn btn-info btn-xs">
-                                                            {{ number_format($rekap->total) }} Perkara
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <span class="btn btn-success btn-xs">
-                                                            {{ number_format($rekap->selesai) }} Perkara
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <span class="btn btn-danger btn-xs">
-                                                            {{ number_format($rekap->belum_selesai) }} Perkara
-                                                        </span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="progress-wrapper flex-grow-1 mr-3">
-                                                                <div class="progress"
-                                                                    style="height: 20px; border-radius: 10px;">
-                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
-                                                            @if ($progress >= 80) bg-success
-                                                            @elseif($progress >= 50) bg-warning
-                                                            @else bg-danger @endif"
-                                                                        role="progressbar"
-                                                                        style="width: {{ $progress }}%; border-radius: 10px;"
-                                                                        aria-valuenow="{{ $progress }}"
-                                                                        aria-valuemin="0" aria-valuemax="100">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="progress-text">
-                                                                <span
-                                                                    class="font-weight-bold
-                                                        @if ($progress >= 80) text-success
-                                                        @elseif($progress >= 50) text-warning
-                                                        @else text-danger @endif"
-                                                                    style="font-size: 14px; min-width: 45px; display: inline-block;">
-                                                                    {{ $progress }}%
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-
-                                            @if ($rekap_tahun->isEmpty())
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-4">
-                                                        <div class="alert alert-info mb-0">
-                                                            <i class="fa fa-info-circle mr-2"></i> Belum ada data untuk
-                                                            direkap.
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                        @if (!$rekap_tahun->isEmpty())
-                                            <tfoot class="bg-light">
-                                                <tr>
-                                                    <th colspan="2" class="text-center align-middle">TOTAL KESELURUHAN
-                                                    </th>
-                                                    <th class="text-center align-middle">
-                                                        <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('total')) }} Perkara
-                                                        </span>
-                                                    </th>
-                                                    <th class="text-center align-middle">
-                                                        <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('selesai')) }} Perkara
-                                                        </span>
-                                                    </th>
-                                                    <th class="text-center align-middle">
-                                                        <span class="btn btn-primary btn-xs">
-                                                            {{ number_format($rekap_tahun->sum('belum_selesai')) }} Perkara
-                                                        </span>
-                                                    </th>
-                                                    <th class="text-center align-middle">
-                                                        @php
-                                                            $total_keseluruhan = $rekap_tahun->sum('total');
-                                                            $selesai_keseluruhan = $rekap_tahun->sum('selesai');
-                                                            $progress_keseluruhan =
-                                                                $total_keseluruhan > 0
-                                                                    ? round(
-                                                                        ($selesai_keseluruhan / $total_keseluruhan) *
-                                                                            100,
-                                                                    )
-                                                                    : 0;
-                                                        @endphp
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <div class="progress-wrapper flex-grow-1 mr-3"
-                                                                style="max-width: 200px;">
-                                                                <div class="progress"
-                                                                    style="height: 20px; border-radius: 10px;">
-                                                                    <div class="progress-bar progress-bar-striped progress-bar-animated
-                                                            @if ($progress_keseluruhan >= 80) bg-success
-                                                            @elseif($progress_keseluruhan >= 50) bg-warning
-                                                            @else bg-danger @endif"
-                                                                        role="progressbar"
-                                                                        style="width: {{ $progress_keseluruhan }}%; border-radius: 10px;"
-                                                                        aria-valuenow="{{ $progress_keseluruhan }}"
-                                                                        aria-valuemin="0" aria-valuemax="100">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="progress-text">
-                                                                <span
-                                                                    class="font-weight-bold
-                                                        @if ($progress_keseluruhan >= 80) text-success
-                                                        @elseif($progress_keseluruhan >= 50) text-warning
-                                                        @else text-danger @endif"
-                                                                    style="font-size: 16px; min-width: 50px; display: inline-block;">
-                                                                    {{ $progress_keseluruhan }}%
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </th>
-                                                </tr>
-                                            </tfoot>
-                                        @endif
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @elseif(Auth::user()->level === 3)
-    @endif
-
-
+    <?php elseif(Auth::user()->level === 3): ?>
+    <?php endif; ?>
 
     <style>
         /* Base Styles untuk card */
@@ -539,7 +402,7 @@
             animation: wave 2s infinite linear;
         }
 
-        @keyframes wave {
+        @keyframes  wave {
             0% {
                 transform: translateX(-100%);
             }
@@ -554,7 +417,7 @@
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
+        @keyframes  pulse {
             0% {
                 transform: scale(1);
             }
@@ -572,7 +435,7 @@
             animation: bounce 2s infinite;
         }
 
-        @keyframes bounce {
+        @keyframes  bounce {
 
             0%,
             20%,
@@ -595,7 +458,7 @@
             animation: shake 2s ease-in-out infinite;
         }
 
-        @keyframes shake {
+        @keyframes  shake {
 
             0%,
             100% {
@@ -615,7 +478,7 @@
             animation: rotate 3s infinite linear;
         }
 
-        @keyframes rotate {
+        @keyframes  rotate {
             from {
                 transform: rotate(0deg);
             }
@@ -630,7 +493,7 @@
             animation: numberPop 0.5s ease-out;
         }
 
-        @keyframes numberPop {
+        @keyframes  numberPop {
             0% {
                 transform: scale(0.5);
                 opacity: 0;
@@ -703,7 +566,7 @@
             animation: progress-bar-stripes 1s linear infinite;
         }
 
-        @keyframes progress-bar-stripes {
+        @keyframes  progress-bar-stripes {
             0% {
                 background-position: 1rem 0;
             }
@@ -801,4 +664,6 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.v_template', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\Admin\Desktop\pm_hukum_app\resources\views//kasasi/v_kasasi_dashboard.blade.php ENDPATH**/ ?>

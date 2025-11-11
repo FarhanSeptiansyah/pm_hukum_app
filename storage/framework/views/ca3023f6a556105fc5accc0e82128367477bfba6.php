@@ -125,13 +125,14 @@
                     <br>
                     <!-- TABEL DATA RETENSI -->
                     <div class="table-responsive">
-                        <table class="table table-bordered tabel-hover">
+                        <table class="table table-bordered table-hover">
                             <thead class="bg-info text-white">
                                 <tr>
                                     <th width="5%" class="text-center align-middle">No</th>
                                     <th width="15%" class="text-center align-middle">Nomor Arsip</th>
                                     <th width="10%" class="text-center align-middle">Tahun</th>
                                     <th width="15%" class="text-center align-middle">Status</th>
+                                    <th width="5%%" class="text-center align-middle">Putusan</th>
                                     <th width="15%" class="text-center align-middle">Tanggal Upload</th>
                                     <th width="15%" class="text-center align-middle">Aksi</th>
                                 </tr>
@@ -144,17 +145,24 @@
                                             <strong><?php echo e($retensi->no_banding ?? 'Belum ada nomor'); ?></strong>
                                         </td>
                                         <td class="text-center align-middle">
-                                            <span class="badge badge-info"><?php echo e($retensi->tahun); ?></span>
+                                            <span class="btn btn-info btn-xs"><?php echo e($retensi->tahun); ?></span>
                                         </td>
                                         <td class="text-center align-middle">
                                             <?php if($retensi->putusan): ?>
-                                                <span class="badge badge-success badge-lg">
+                                                <span class="btn btn-success btn-xs">
                                                     <i class="fa fa-check mr-1"></i>Sudah Upload
                                                 </span>
                                             <?php else: ?>
-                                                <span class="badge badge-danger badge-lg">
+                                                <span class="btn btn-danger btn-xs">
                                                     <i class="fa fa-clock-o mr-1"></i>Belum Upload
                                                 </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if($retensi->putusan == ''): ?>
+                                            <?php else: ?>
+                                                <a href="<?php echo e(asset('public/retensi_arsip_perkara/' . $retensi->putusan)); ?>"
+                                                    class="text-blue"><i class="fa fa-file-pdf-o"></i></a>
                                             <?php endif; ?>
                                         </td>
                                         <td class="text-center align-middle">
@@ -165,33 +173,38 @@
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
+                                        </td>
                                         <td class="text-center align-middle">
-                                            <div class="btn-group">
+                                            <div class="btn-group btn-group-xs">
                                                 <?php if(Auth::user()->level === 1): ?>
-                                                    <button type="button" class="btn btn-purple btn-xs"
-                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>">
+                                                    <button type="button" class="btn btn-info btn-xs"
+                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>"
+                                                        title="Detail">
                                                         <i class="fa fa-eye"></i>
                                                     </button>
                                                     <a href="/retensi/edit/<?php echo e($retensi->id); ?>"
-                                                        class="btn btn-warning btn-xs">
+                                                        class="btn btn-warning btn-xs" title="Edit">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
                                                     <button type="button" class="btn btn-danger btn-xs"
-                                                        data-toggle="modal" data-target="#delete<?php echo e($retensi->id); ?>">
-                                                        <i class="fa fa-trash-o"></i>
+                                                        data-toggle="modal" data-target="#delete<?php echo e($retensi->id); ?>"
+                                                        title="Hapus">
+                                                        <i class="fa fa-trash"></i>
                                                     </button>
                                                 <?php elseif(Auth::user()->level === 2): ?>
-                                                    <button type="button" class="btn btn-purple btn-xs"
-                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>">
+                                                    <button type="button" class="btn btn-info btn-xs"
+                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>"
+                                                        title="Detail">
                                                         <i class="fa fa-eye"></i>
                                                     </button>
                                                     <a href="/retensi/edit/<?php echo e($retensi->id); ?>"
-                                                        class="btn btn-warning btn-xs">
+                                                        class="btn btn-warning btn-xs" title="Edit">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
                                                 <?php elseif(Auth::user()->level === 3): ?>
-                                                    <button type="button" class="btn btn-purple btn-xs"
-                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>">
+                                                    <button type="button" class="btn btn-info btn-xs"
+                                                        data-toggle="modal" data-target="#detail<?php echo e($retensi->id); ?>"
+                                                        title="Detail">
                                                         <i class="fa fa-eye"></i>
                                                     </button>
                                                 <?php endif; ?>
@@ -202,8 +215,8 @@
                                     <tr>
                                         <td colspan="6" class="text-center py-4">
                                             <div class="alert alert-info mb-0">
-                                                <i class="fa fa-info-circle mr-2"></i> Tidak ada data retensi untuk
-                                                tahun <?php echo e($tahun); ?>.
+                                                <i class="fa fa-info-circle mr-2"></i> Tidak ada data retensi untuk tahun
+                                                <?php echo e($tahun); ?>.
                                             </div>
                                         </td>
                                     </tr>

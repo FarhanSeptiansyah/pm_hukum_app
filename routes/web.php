@@ -96,11 +96,15 @@ Route::get('/peraturan_lainnya', [JdihController::class, 'peraturan_lainnya'])->
 
 //Kasasi
 Route::get('/kasasi', [KasasiController::class, 'index'])->name('kasasi');
+Route::get('/kasasi_total', [KasasiController::class, 'kasasi_total'])->name('kasasi_total.kasasi');
 Route::get('/kasasi/detail/{id}', [KasasiController::class, 'detail'])->name('detail');
 Route::get('/kasasi/add', [KasasiController::class, 'add'])->name('add');
 Route::post('/kasasi/insert', [KasasiController::class, 'insert'])->name('insert');
 Route::get('/kasasi/edit/{id}', [KasasiController::class, 'edit'])->name('edit');
 Route::post('/kasasi/update/{id}', [KasasiController::class, 'update'])->name('update');
+Route::get('/kasasi/tahun/{tahun}', [KasasiController::class, 'showByYear'])->name('kasasi.by_year');
+Route::get('/kasasi/download/{id}', [KasasiController::class, 'downloadPutusan'])->name('kasasi.download');
+Route::get('/kasasi/detail/{id}', [KasasiController::class, 'showDetail'])->name('kasasi.detail');
 // Route::get('/kasasi/delete/{id}', [KasasiController::class, 'delete'])->name('delete');
 
 //Pbt putusan

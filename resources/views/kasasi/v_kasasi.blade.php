@@ -35,8 +35,10 @@
             <td class="text-center" style="font-size: 5px;">
                 @if (Auth::user()->level === 1)
                     <a href="/kasasi/add" class="btn btn-sm btn-info mb-2">Tambah Data</a>
+                    <a href="/kasasi" class="btn btn-sm btn-danger mb-2">Dasbaoard</a>
                 @elseif(Auth::user()->level === 2)
                     <a href="/kasasi/add" class="btn btn-sm btn-info mb-2">Tambah Data</a>
+                    <a href="/kasasi" class="btn btn-sm btn-danger mb-2">Dasbaoard</a>
                 @elseif(Auth::user()->level === 3)
                 @endif
             </td>
@@ -53,8 +55,9 @@
                         <th class="text-center" style="width: 10px;">No</th>
                         {{-- <th class="text-center" style="width: 50px;">Satker</th> --}}
                         <th class="text-center" style="width: 60px;">Tanggal Masuk</th>
+                        <th class="text-center" style="width: 60px;">Tanggal Permohonan</th>
                         <!-- <th style="width: 100px;">Pemohon</th>
-                        <th style="width: 100px;">Termohon</th> -->
+                                    <th style="width: 100px;">Termohon</th> -->
                         <th class="text-center" style="width: 70px;">Nomor Kasasi</th>
                         {{-- <th class="text-center" style="width: 50px;">Putus Kasasi</th> --}}
                         <th class="text-center" style="width: 70px;">Nomor Banding</th>
@@ -69,8 +72,9 @@
                         <th>No</th>
                         {{-- <th>Satker</th> --}}
                         <th>Tanggal Masuk</th>
+                        <th>Tanggal Permohonan</th>
                         <!-- <th>Pemohon</th>
-                        <th>Termohon</th> -->
+                                    <th>Termohon</th> -->
                         <th>Nomor Kasasi</th>
                         {{-- <th>Putus Kasasi</th> --}}
                         <th>Nomor Banding</th>
@@ -86,6 +90,15 @@
                             <td class="text-center">{{ $loop->iteration }}</td>
                             {{-- <td class="text-center">{{ $data->pa_pengaju }}</td> --}}
                             <td class="text-center">{{ date('d-m-Y', strtotime($data->tgl_masuk)) }}</td>
+                            <td class="text-center">
+                                @if ($data->tgl_register == '')
+                                    <span class="badge badge-danger">Data Not Available</span>
+                                @elseif($data->tgl_register == '0000-00-00')
+                                    <span class="badge badge-danger">Data Not Available</span>
+                                @else
+                                    {{ date('d-m-Y', strtotime($data->tgl_register)) }}
+                                @endif
+                            </td>
                             {{-- <!-- <td>{{ $data->pemohon_kasasi }}</td>
                     <td>{{ $data->termohon_kasasi }}</td> --> --}}
                             <td class="text-center">{{ $data->no_kasasi }}</td>
@@ -103,12 +116,12 @@
                             <td class="text-center">{{ $data->status_put }}</td>
                             <!-- <td class="text-center">
 
-                            @if ($data->salput_kasasi == '')
-    <i class="bi text-danger bi-filetype-pdf"></i>
-@else
-    <a href="kasasi_perkara_putusan/{{ $data->salput_kasasi }}" class="text-blue" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
-    @endif
-                        </td> -->
+                                        @if ($data->salput_kasasi == '')
+                                            <i class="bi text-danger bi-filetype-pdf"></i>
+                                        @else
+                                            <a href="kasasi_perkara_putusan/{{ $data->salput_kasasi }}" class="text-blue" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+                                            @endif
+                                    </td> -->
                             <td class="text-center">
                                 @if ($data->salput_kasasi == '')
                                     <i class="bi text-danger bi-filetype-pdf"></i>
